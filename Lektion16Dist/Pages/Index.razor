@@ -1,0 +1,52 @@
+﻿@page "/"
+@using Business.Services;
+@inject Store store
+
+<PageTitle>Index</PageTitle>
+
+<h1>Shop</h1>
+
+<input @onchange="Filter" />
+<input @bind="productName"/>
+<button class="btn btn-primary" @onclick="@(() => store.AddProduct(productName))">Click me</button>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>Product</th>
+            <th>Action</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var product in store.GetProducts(p => p.Name.ToLower().StartsWith(name.ToLower())))
+        {
+            <tr>
+                <td>@product.Id</td>
+                <td>@product.Name</td>
+                <td><button class="btn btn-warning" @onclick="@(() => store.RemoveProduct(product))">Remove</button></td>
+                <td></td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@if (store.Error.Length > 0)
+{
+    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+        <strong>Error!</strong> @store.Error
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+@code{
+    string name = string.Empty, productName = string.Empty;
+
+    void Filter(ChangeEventArgs e)
+    {
+        if (e is null || e.Value is null) name = string.Empty;
+        //if (e.Value.ToString().Length < 2) return;
+        name = e.Value.ToString();
+    }
+}
